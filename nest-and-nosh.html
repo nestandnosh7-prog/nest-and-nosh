@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nest & Nosh — Handcrafted Bakes & Sweets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blush:    #F9DADA;
+      --rose:     #E8AABB;
+      --mint:     #C8E8DF;
+      --sage:     #97C9B8;
+      --butter:   #FDF0C2;
+      --lavender: #DDD4F0;
+      --lilac:    #C2B4E2;
+      --cream:    #FDF8F2;
+      --bark:     #5C3D2E;
+      --text:     #3A2A20;
+      --muted:    #8A7060;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE TEXTURE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9999;
+      opacity: .5;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      background: rgba(253,248,242,.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(200,160,140,.15);
+    }
+    .nav-logo {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2rem;
+      color: var(--bark);
+      letter-spacing: .02em;
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .85rem;
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--bark); }
+    .nav-cart {
+      background: var(--rose);
+      color: var(--bark);
+      border: none; cursor: pointer;
+      padding: .55rem 1.2rem;
+      border-radius: 2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .85rem;
+      font-weight: 500;
+      display: flex; align-items: center; gap: .5rem;
+      transition: background .2s, transform .15s;
+    }
+    .nav-cart:hover { background: var(--blush); transform: translateY(-1px); }
+    #cart-count {
+      background: var(--bark); color: #fff;
+      border-radius: 50%; width: 1.3rem; height: 1.3rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 700;
+    }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding-top: 5rem;
+      overflow: hidden;
+    }
+    .hero-left {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 5rem 3rem 5rem 6rem;
+      position: relative;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: var(--butter);
+      color: var(--bark);
+      font-size: .78rem;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: .4rem 1rem;
+      border-radius: 2rem;
+      margin-bottom: 1.8rem;
+      width: fit-content;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 5vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.1;
+      color: var(--bark);
+      margin-bottom: 1.5rem;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--sage);
+    }
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 400px;
+      margin-bottom: 2.5rem;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--bark);
+      color: #fff;
+      padding: .9rem 2.2rem;
+      border-radius: 3rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      font-weight: 500;
+      letter-spacing: .04em;
+      text-decoration: none;
+      border: none; cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 4px 18px rgba(92,61,46,.2);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(92,61,46,.28);
+    }
+    .btn-outline {
+      display: inline-block;
+      background: transparent;
+      color: var(--bark);
+      padding: .9rem 2.2rem;
+      border-radius: 3rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      font-weight: 500;
+      letter-spacing: .04em;
+      text-decoration: none;
+      border: 2px solid var(--rose);
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      margin-left: 1rem;
+    }
+    .btn-outline:hover { background: var(--blush); transform: translateY(-2px); }
+
+    .hero-right {
+      position: relative;
+      background: linear-gradient(135deg, var(--blush) 0%, var(--lavender) 50%, var(--mint) 100%);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .hero-blob {
+      position: absolute;
+      border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%;
+      opacity: .35;
+      animation: blobFloat 7s ease-in-out infinite;
+    }
+    .hero-blob-1 { width: 420px; height: 420px; background: var(--rose); top: -60px; right: -60px; }
+    .hero-blob-2 { width: 300px; height: 300px; background: var(--butter); bottom: -40px; left: -40px; animation-delay: -3s; }
+    @keyframes blobFloat {
+      0%,100% { border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%; transform: translateY(0); }
+      50% { border-radius: 45% 55% 40% 60% / 60% 40% 60% 40%; transform: translateY(-16px); }
+    }
+    .hero-illustration {
+      position: relative; z-index: 2;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;
+      padding: 3rem;
+    }
+    .sweet-card {
+      background: rgba(253,248,242,.88);
+      backdrop-filter: blur(8px);
+      border-radius: 1.5rem;
+      padding: 1.8rem 1.4rem;
+      text-align: center;
+      box-shadow: 0 6px 24px rgba(92,61,46,.1);
+      transition: transform .3s;
+    }
+    .sweet-card:hover { transform: translateY(-6px) rotate(-1deg); }
+    .sweet-card:nth-child(2) { margin-top: 2rem; }
+    .sweet-card:nth-child(3) { margin-top: -1.5rem; }
+    .sweet-icon { font-size: 3rem; margin-bottom: .6rem; display: block; }
+    .sweet-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--bark);
+    }
+    .sweet-sub { font-size: .78rem; color: var(--muted); margin-top: .2rem; }
+
+    /* ─── SECTION COMMONS ─── */
+    section { padding: 6rem 6rem; }
+    .section-tag {
+      font-size: .78rem;
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: .8rem;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 3.5vw, 3.2rem);
+      font-weight: 300;
+      color: var(--bark);
+      line-height: 1.2;
+      margin-bottom: 1.2rem;
+    }
+    .section-title em { font-style: italic; color: var(--lilac); }
+    .section-body {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 560px;
+    }
+
+    /* ─── ABOUT ─── */
+    #about {
+      background: var(--butter);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    .about-visual {
+      position: relative; height: 420px;
+    }
+    .about-card {
+      position: absolute;
+      background: #fff;
+      border-radius: 1.8rem;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(92,61,46,.1);
+    }
+    .about-card-main {
+      width: 260px; left: 0; top: 20px;
+      background: var(--blush);
+    }
+    .about-card-accent {
+      width: 200px; right: 0; top: 80px;
+      background: var(--mint);
+    }
+    .about-card-bottom {
+      width: 220px; left: 40px; bottom: 0;
+      background: var(--lavender);
+    }
+    .about-card .icon { font-size: 2.5rem; margin-bottom: .8rem; }
+    .about-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--bark);
+      margin-bottom: .4rem;
+    }
+    .about-card p { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+    .about-badges { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 2rem; }
+    .badge {
+      background: #fff;
+      border: 1px solid var(--rose);
+      color: var(--bark);
+      border-radius: 2rem;
+      padding: .35rem .9rem;
+      font-size: .8rem;
+      font-weight: 500;
+    }
+
+    /* ─── SHOP ─── */
+    #shop { background: var(--cream); }
+    .shop-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 3rem; }
+    .filter-tabs { display: flex; gap: .6rem; }
+    .tab {
+      padding: .45rem 1.1rem;
+      border-radius: 2rem;
+      border: 2px solid transparent;
+      font-size: .85rem; font-weight: 500;
+      cursor: pointer; transition: all .2s;
+      background: var(--butter);
+      color: var(--muted);
+    }
+    .tab.active, .tab:hover {
+      background: var(--bark); color: #fff;
+      border-color: var(--bark);
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.8rem;
+    }
+    .product-card {
+      background: #fff;
+      border-radius: 2rem;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(92,61,46,.07);
+      transition: transform .3s, box-shadow .3s;
+      position: relative;
+    }
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 36px rgba(92,61,46,.14);
+    }
+    .product-img {
+      height: 180px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem;
+      position: relative;
+    }
+    .product-img-bg { position: absolute; inset: 0; opacity: .55; }
+    .product-img-icon { position: relative; z-index: 1; }
+    .product-body { padding: 1.4rem 1.4rem 1.6rem; }
+    .product-cat {
+      font-size: .72rem; font-weight: 500;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: .4rem;
+    }
+    .product-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--bark);
+      margin-bottom: .3rem;
+    }
+    .product-desc { font-size: .82rem; color: var(--muted); line-height: 1.55; margin-bottom: 1rem; }
+    .product-footer {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .product-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--bark);
+    }
+    .add-btn {
+      background: var(--bark); color: #fff;
+      border: none; cursor: pointer;
+      padding: .55rem 1.2rem;
+      border-radius: 2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .82rem; font-weight: 500;
+      transition: background .2s, transform .15s;
+    }
+    .add-btn:hover { background: var(--rose); color: var(--bark); transform: scale(1.04); }
+    .product-badge-new {
+      position: absolute; top: 1rem; right: 1rem;
+      background: var(--rose); color: var(--bark);
+      font-size: .68rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: .25rem .7rem; border-radius: 2rem;
+      z-index: 2;
+    }
+
+    /* ─── PROCESS ─── */
+    #process {
+      background: var(--lavender);
+      text-align: center;
+    }
+    #process .section-title { margin: 0 auto 1rem; }
+    #process .section-body { margin: 0 auto 4rem; }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; margin-top: 2rem; }
+    .step {
+      background: rgba(255,255,255,.6);
+      backdrop-filter: blur(8px);
+      border-radius: 1.8rem;
+      padding: 2.2rem 1.5rem;
+      position: relative;
+      transition: transform .3s;
+    }
+    .step:hover { transform: translateY(-6px); }
+    .step-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.5rem;
+      font-weight: 300;
+      color: rgba(92,61,46,.12);
+      line-height: 1;
+      margin-bottom: .5rem;
+    }
+    .step-icon { font-size: 2rem; margin-bottom: .8rem; display: block; }
+    .step h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--bark);
+      margin-bottom: .5rem;
+    }
+    .step p { font-size: .82rem; color: var(--muted); line-height: 1.6; }
+
+    /* ─── CTA ─── */
+    #cta {
+      background: var(--bark);
+      color: #fff;
+      text-align: center;
+      padding: 6rem;
+      position: relative;
+      overflow: hidden;
+    }
+    #cta::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(232,170,187,.2), transparent 60%),
+                  radial-gradient(ellipse at 70% 50%, rgba(200,232,223,.15), transparent 60%);
+    }
+    #cta .section-title { color: #fff; position: relative; z-index: 1; margin: 0 auto .8rem; }
+    #cta .section-title em { color: var(--rose); }
+    #cta .section-body { color: rgba(255,255,255,.65); margin: 0 auto 2.5rem; position: relative; z-index: 1; }
+    .cta-btns { display: flex; gap: 1rem; justify-content: center; position: relative; z-index: 1; }
+    .btn-light {
+      background: #fff; color: var(--bark);
+      padding: .9rem 2.2rem;
+      border-radius: 3rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem; font-weight: 500;
+      border: none; cursor: pointer;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 4px 18px rgba(0,0,0,.15);
+    }
+    .btn-light:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,.2); }
+    .btn-ghost {
+      background: transparent; color: #fff;
+      padding: .9rem 2.2rem;
+      border-radius: 3rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem; font-weight: 500;
+      border: 2px solid rgba(255,255,255,.35);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,.1); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #2A1A12;
+      color: rgba(255,255,255,.5);
+      padding: 3rem 6rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-logo {
+      font-family: 'Great Vibes', cursive;
+      font-size: 1.8rem; color: #fff;
+    }
+    footer p { font-size: .8rem; }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { color: rgba(255,255,255,.5); font-size: .82rem; text-decoration: none; transition: color .2s; }
+    .footer-links a:hover { color: #fff; }
+
+    /* ─── CART DRAWER ─── */
+    .cart-overlay {
+      position: fixed; inset: 0;
+      background: rgba(42,26,18,.5);
+      z-index: 200;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s;
+    }
+    .cart-overlay.open { opacity: 1; pointer-events: all; }
+    .cart-drawer {
+      position: fixed; top: 0; right: 0;
+      width: 380px; height: 100vh;
+      background: var(--cream);
+      z-index: 201;
+      transform: translateX(100%);
+      transition: transform .35s cubic-bezier(.4,0,.2,1);
+      display: flex; flex-direction: column;
+      box-shadow: -8px 0 32px rgba(42,26,18,.15);
+    }
+    .cart-drawer.open { transform: translateX(0); }
+    .cart-head {
+      padding: 1.8rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(200,160,140,.2);
+    }
+    .cart-head h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 600;
+      color: var(--bark);
+    }
+    .cart-close {
+      background: none; border: none; font-size: 1.5rem;
+      cursor: pointer; color: var(--muted);
+      line-height: 1; padding: .2rem;
+    }
+    .cart-items { flex: 1; overflow-y: auto; padding: 1.5rem 2rem; }
+    .cart-empty {
+      text-align: center; color: var(--muted);
+      padding: 3rem 0;
+    }
+    .cart-empty span { font-size: 3rem; display: block; margin-bottom: 1rem; }
+    .cart-item {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1rem 0; border-bottom: 1px solid rgba(200,160,140,.12);
+    }
+    .cart-item-icon { font-size: 2.2rem; width: 48px; text-align: center; }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 600; color: var(--bark); }
+    .cart-item-price { font-size: .85rem; color: var(--muted); margin-top: .15rem; }
+    .cart-item-qty {
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .qty-btn {
+      width: 26px; height: 26px;
+      background: var(--blush); border: none; cursor: pointer;
+      border-radius: 50%; font-size: 1rem; line-height: 1;
+      color: var(--bark); transition: background .2s;
+    }
+    .qty-btn:hover { background: var(--rose); }
+    .qty-val { font-size: .9rem; font-weight: 500; min-width: 20px; text-align: center; color: var(--bark); }
+    .cart-foot {
+      padding: 1.5rem 2rem 2rem;
+      border-top: 1px solid rgba(200,160,140,.2);
+    }
+    .cart-total {
+      display: flex; justify-content: space-between;
+      margin-bottom: 1.2rem;
+    }
+    .cart-total span { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; color: var(--bark); }
+    .checkout-btn {
+      width: 100%;
+      background: var(--bark); color: #fff;
+      border: none; cursor: pointer;
+      padding: 1rem;
+      border-radius: 3rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem; font-weight: 500;
+      transition: background .2s;
+    }
+    .checkout-btn:hover { background: #7a5040; }
+
+    /* ─── ANIMATIONS ─── */
+    .fade-in {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      #hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-left { padding: 6rem 2rem 3rem; }
+      .hero-right { height: 400px; }
+      section { padding: 4rem 2rem; }
+      #about { grid-template-columns: 1fr; gap: 3rem; }
+      .about-visual { height: 280px; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      footer { flex-direction: column; gap: 1.2rem; text-align: center; padding: 2rem; }
+      .shop-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .cart-drawer { width: 100vw; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Nest & Nosh</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#shop">Shop</a></li>
+    <li><a href="#process">How It Works</a></li>
+    <li><a href="#cta">Contact</a></li>
+  </ul>
+  <button class="nav-cart" onclick="toggleCart()">
+    🛍 Cart
+    <span id="cart-count">0</span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left fade-in">
+    <span class="hero-tag">✨ Handcrafted with love</span>
+    <h1 class="hero-title">
+      Baked from<br>
+      <em>the heart,</em><br>
+      sweet to the soul
+    </h1>
+    <p class="hero-sub">
+      Artisan bakes and handcrafted candies made in small batches — for every celebration, craving, and cozy moment in between.
+    </p>
+    <div>
+      <a href="#shop" class="btn-primary">Shop Now</a>
+      <a href="#about" class="btn-outline">Our Story</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+    <div class="hero-illustration">
+      <div class="sweet-card">
+        <span class="sweet-icon">🧁</span>
+        <div class="sweet-label">Cupcakes</div>
+        <div class="sweet-sub">Seasonal flavors</div>
+      </div>
+      <div class="sweet-card">
+        <span class="sweet-icon">🍬</span>
+        <div class="sweet-label">Candy</div>
+        <div class="sweet-sub">Handpulled & poured</div>
+      </div>
+      <div class="sweet-card">
+        <span class="sweet-icon">🍰</span>
+        <div class="sweet-label">Layer Cakes</div>
+        <div class="sweet-sub">Custom orders</div>
+      </div>
+      <div class="sweet-card">
+        <span class="sweet-icon">🍫</span>
+        <div class="sweet-label">Chocolates</div>
+        <div class="sweet-sub">Belgian + local</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="fade-in">
+  <div class="about-visual">
+    <div class="about-card about-card-main">
+      <div class="icon">🌸</div>
+      <h3>Made Fresh Daily</h3>
+      <p>Every item is baked or crafted the morning of — never frozen, always fresh.</p>
+    </div>
+    <div class="about-card about-card-accent">
+      <div class="icon">🌿</div>
+      <h3>Real Ingredients</h3>
+      <p>No artificial dyes or flavors. We use natural extracts and seasonal produce.</p>
+    </div>
+    <div class="about-card about-card-bottom">
+      <div class="icon">🎀</div>
+      <h3>Gift Ready</h3>
+      <p>Beautiful packaging for every order — perfect for gifting as-is.</p>
+    </div>
+  </div>
+  <div>
+    <p class="section-tag">Our Story</p>
+    <h2 class="section-title">A cozy corner of<br><em>sweetness & warmth</em></h2>
+    <p class="section-body">
+      Nest & Nosh was born from a simple belief: that the best sweets are made slowly, with quality ingredients and a whole lot of care. We blend classic baking techniques with playful candy craft to create treats that feel like a hug in every bite.
+    </p>
+    <p class="section-body" style="margin-top:1rem;">
+      From fluffy layer cakes to hand-pulled caramels and painted chocolates, everything we make tells a story — and we'd love it to be part of yours.
+    </p>
+    <div class="about-badges">
+      <span class="badge">🏡 Home Bakery</span>
+      <span class="badge">🎂 Custom Orders</span>
+      <span class="badge">🌸 Seasonal Menus</span>
+      <span class="badge">📦 Local Delivery</span>
+      <span class="badge">🎁 Gift Boxes</span>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP -->
+<section id="shop">
+  <div class="shop-header fade-in">
+    <div>
+      <p class="section-tag">Our Menu</p>
+      <h2 class="section-title">Pick your <em>favourite</em></h2>
+    </div>
+    <div class="filter-tabs">
+      <button class="tab active" onclick="filterProducts('all', this)">All</button>
+      <button class="tab" onclick="filterProducts('baked', this)">Baked Goods</button>
+      <button class="tab" onclick="filterProducts('candy', this)">Candy & Sweets</button>
+    </div>
+  </div>
+
+  <div class="products-grid" id="products-grid">
+    <!-- Populated by JS -->
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process" class="fade-in">
+  <p class="section-tag">How It Works</p>
+  <h2 class="section-title">From our kitchen<br><em>to your door</em></h2>
+  <p class="section-body">Ordering is easy — and every box is packed with care.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <span class="step-icon">🛒</span>
+      <h3>Browse & Order</h3>
+      <p>Choose from our menu or request a custom creation for your occasion.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <span class="step-icon">👩‍🍳</span>
+      <h3>We Bake Fresh</h3>
+      <p>Your order is prepared fresh the day before delivery or pickup.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <span class="step-icon">🎀</span>
+      <h3>Gift-Wrapped</h3>
+      <p>Packed beautifully in our signature pastel boxes, ready to delight.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <span class="step-icon">🚗</span>
+      <h3>Pickup or Delivery</h3>
+      <p>Choose local delivery or porch pickup — whichever works best for you.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <h2 class="section-title">Something <em>special</em><br>in mind?</h2>
+  <p class="section-body">Custom cakes, candy boxes, event dessert tables — we love a good challenge. Let's create something unforgettable together.</p>
+  <div class="cta-btns">
+    <a href="mailto:hello@nestandnosh.com" class="btn-light">Send Us a Message</a>
+    <a href="#shop" class="btn-ghost">Browse the Menu</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">Nest & Nosh</span>
+  <p>© 2026 Nest & Nosh. Made with love.</p>
+  <div class="footer-links">
+    <a href="#">Instagram</a>
+    <a href="#">Facebook</a>
+    <a href="mailto:hello@nestandnosh.com">Email</a>
+  </div>
+</footer>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-head">
+    <h2>Your Order</h2>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items">
+    <div class="cart-empty">
+      <span>🧺</span>
+      Your basket is empty.<br>Add something sweet!
+    </div>
+  </div>
+  <div class="cart-foot">
+    <div class="cart-total">
+      <span>Total</span>
+      <span id="cart-total">$0.00</span>
+    </div>
+    <button class="checkout-btn" onclick="checkout()">Place Order →</button>
+  </div>
+</div>
+
+<script>
+  const PRODUCTS = [
+    { id:1, cat:'baked', icon:'🧁', bg:'#F9DADA', name:'Signature Cupcakes', desc:'Six seasonal flavours, whipped frosting, edible florals.', price:18.00, new:false },
+    { id:2, cat:'candy', icon:'🍬', bg:'#DDD4F0', name:'Artisan Candy Jar', desc:'Hand-pulled taffy, caramels & fruit chews in a keepsake jar.', price:22.00, new:true },
+    { id:3, cat:'baked', icon:'🍰', bg:'#C8E8DF', name:'Layer Cake (6")', desc:'Four layers, silky buttercream, customizable flavour.', price:48.00, new:false },
+    { id:4, cat:'candy', icon:'🍫', bg:'#FDF0C2', name:'Chocolate Box (12)', desc:'Belgian chocolate shells, flavoured ganache fillings.', price:26.00, new:true },
+    { id:5, cat:'baked', icon:'🥐', bg:'#E8AABB', name:'Morning Pastry Box', desc:'Croissants, scones, mini danishes — serves four.', price:32.00, new:false },
+    { id:6, cat:'candy', icon:'🍭', bg:'#C8E8DF', name:'Lollipop Set (8)', desc:'Botanical pressed pops in rose, lavender & citrus.', price:20.00, new:false },
+    { id:7, cat:'baked', icon:'🍪', bg:'#FDF0C2', name:'Cookie Assortment', desc:'Twelve hand-decorated butter cookies, seasonal designs.', price:24.00, new:false },
+    { id:8, cat:'candy', icon:'🍮', bg:'#DDD4F0', name:'Caramel Collection', desc:'Salted, vanilla bean, and apple spice soft caramels.', price:16.00, new:true },
+  ];
+
+  let cart = {};
+  let activeFilter = 'all';
+
+  function renderProducts(filter) {
+    const grid = document.getElementById('products-grid');
+    const filtered = filter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === filter);
+    grid.innerHTML = filtered.map(p => `
+      <div class="product-card fade-in visible">
+        ${p.new ? '<span class="product-badge-new">New</span>' : ''}
+        <div class="product-img" style="background:${p.bg}20">
+          <div class="product-img-bg" style="background:${p.bg}"></div>
+          <span class="product-img-icon">${p.icon}</span>
+        </div>
+        <div class="product-body">
+          <div class="product-cat">${p.cat === 'baked' ? 'Baked Goods' : 'Candy & Sweets'}</div>
+          <div class="product-name">${p.name}</div>
+          <div class="product-desc">${p.desc}</div>
+          <div class="product-footer">
+            <span class="product-price">$${p.price.toFixed(2)}</span>
+            <button class="add-btn" onclick="addToCart(${p.id})">Add to Order</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function filterProducts(filter, btn) {
+    activeFilter = filter;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderProducts(filter);
+  }
+
+  function addToCart(id) {
+    cart[id] = (cart[id] || 0) + 1;
+    updateCart();
+    if (!document.getElementById('cart-drawer').classList.contains('open')) {
+      toggleCart();
+    }
+  }
+
+  function updateQty(id, delta) {
+    cart[id] = (cart[id] || 0) + delta;
+    if (cart[id] <= 0) delete cart[id];
+    updateCart();
+  }
+
+  function updateCart() {
+    const total = Object.entries(cart).reduce((sum, [id, qty]) => {
+      const p = PRODUCTS.find(p => p.id == id);
+      return sum + p.price * qty;
+    }, 0);
+    const count = Object.values(cart).reduce((s, q) => s + q, 0);
+    document.getElementById('cart-count').textContent = count;
+    document.getElementById('cart-total').textContent = '$' + total.toFixed(2);
+
+    const itemsEl = document.getElementById('cart-items');
+    if (count === 0) {
+      itemsEl.innerHTML = `<div class="cart-empty"><span>🧺</span>Your basket is empty.<br>Add something sweet!</div>`;
+      return;
+    }
+    itemsEl.innerHTML = Object.entries(cart).map(([id, qty]) => {
+      const p = PRODUCTS.find(p => p.id == id);
+      return `
+        <div class="cart-item">
+          <span class="cart-item-icon">${p.icon}</span>
+          <div class="cart-item-info">
+            <div class="cart-item-name">${p.name}</div>
+            <div class="cart-item-price">$${(p.price * qty).toFixed(2)}</div>
+          </div>
+          <div class="cart-item-qty">
+            <button class="qty-btn" onclick="updateQty(${id}, -1)">−</button>
+            <span class="qty-val">${qty}</span>
+            <button class="qty-btn" onclick="updateQty(${id}, 1)">+</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function toggleCart() {
+    document.getElementById('cart-drawer').classList.toggle('open');
+    document.getElementById('cart-overlay').classList.toggle('open');
+  }
+
+  function checkout() {
+    if (Object.keys(cart).length === 0) return;
+    const items = Object.entries(cart).map(([id, qty]) => {
+      const p = PRODUCTS.find(p => p.id == id);
+      return `${qty}x ${p.name}`;
+    }).join(', ');
+    const total = Object.entries(cart).reduce((sum, [id, qty]) => {
+      const p = PRODUCTS.find(p => p.id == id);
+      return sum + p.price * qty;
+    }, 0);
+    const subject = encodeURIComponent('Order from Nest & Nosh');
+    const body = encodeURIComponent(`Hi! I'd like to place an order:\n\n${items}\n\nTotal: $${total.toFixed(2)}\n\nPlease let me know next steps. Thank you!`);
+    window.location.href = `mailto:hello@nestandnosh.com?subject=${subject}&body=${body}`;
+  }
+
+  // Intersection Observer for fade-ins
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Init
+  renderProducts('all');
+</script>
+</body>
+</html>
