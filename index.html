@@ -573,6 +573,7 @@
       .cart-drawer { width: 100vw; }
     }
   </style>
+  <script src="https://www.paypal.com/sdk/js?client-id=ATpemFiE4wOVH8qodM_2TEtB5kchiJHG7VHMJbSGD1wmqUp2tGtmJdARhASRgSNU5yEKvOLI-F9VbGyw&currency=USD"></script>
 </head>
 <body>
 
@@ -761,6 +762,7 @@
     </div>
   </div>
   <div class="cart-foot">
+    <div id="paypal-button-container" style="margin-bottom:1rem;"></div>
     <div class="cart-total">
       <span>Total</span>
       <span id="cart-total">$0.00</span>
@@ -886,6 +888,28 @@
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.12 });
   document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  // PayPal
+paypal.Buttons({
+  createOrder: function(data, actions) {
+    const total = Object.entries(cart).reduce((sum, [id, qty]) => {
+      const p = PRODUCTS.find(p => p.id == id);
+      return sum + p.price * qty;
+    }, 0);
+    return actions.order.create({
+      purchase_units: [{
+        amount: { value: total.toFixed(2) },
+        description: 'Nest & Nosh Order'
+      }]
+    });
+  },
+  onApprove: function(data, actions) {
+    return actions.order.capture().then(function(details) {
+      cart = {};
+      updateCart();
+      alert('Order placed! Thank you, ' + details.payer.name.given_name + '! We will be in touch shortly.');
+    });
+  }
+}).render('#paypal-button-container');
 
   // Init
   renderProducts('all');
