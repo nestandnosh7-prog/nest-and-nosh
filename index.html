@@ -470,6 +470,9 @@ function requestCatering(pkgId){
       cart=cart.filter(cc=>cc.key!==key);
       cart.push({key,id:'catering_'+pkg.id,icon:'cakepop',name:pkg.name+(isCustom?' (Custom Quote)':' Catering'),flavor:flavorStr,color:'#F8C5D9',price:pkg.price,qty:1});
       updateCount();
+      submitToJotForm({firstName:'',lastName:'',email:'',phone:'',address:'',date:'',
+        notes:'CATERING REQUEST - '+pkg.name+(pkg.price?' ($'+pkg.price+')':'')+' | Serves: '+(pkg.serves||'TBD')+' | '+flavorStr+'. Awaiting customer contact details.'
+      });
       go('checkout');
       setTimeout(function(){
         var n=document.getElementById('f-notes');
@@ -513,6 +516,16 @@ function renderPayPal(){
     },
     onApprove:function(data,actions){
       return actions.order.capture().then(function(details){
+        var jfData={
+          firstName:document.getElementById('f-first')?document.getElementById('f-first').value:details.payer.name.given_name,
+          lastName:document.getElementById('f-last')?document.getElementById('f-last').value:details.payer.name.family_name,
+          email:details.payer.email_address||(document.getElementById('f-email')?document.getElementById('f-email').value:''),
+          phone:document.getElementById('f-phone')?document.getElementById('f-phone').value:'',
+          address:document.getElementById('f-addr')?document.getElementById('f-addr').value:'',
+          date:document.getElementById('f-date')?document.getElementById('f-date').value:'',
+          notes:buildOrderNotes()
+        };
+        submitToJotForm(jfData);
         cart=[];
         updateCount();
         paypalRendered=false;
@@ -540,6 +553,52 @@ function renderHero(){
 
 let toastT;
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2800);}
+
+
+// ============ JOTFORM ORDER NOTIFICATION ============
+function submitToJotForm(orderData){
+  var formData = new FormData();
+  formData.append('formID', '260155816996065');
+  // Name
+  formData.append('q3_name[first]', orderData.firstName || '');
+  formData.append('q3_name[last]',  orderData.lastName  || '');
+  // Email
+  formData.append('q4_email', orderData.email || '');
+  // Address
+  formData.append('q5_address[addr_line1]', orderData.address || '');
+  // Phone
+  formData.append('q6_phoneNumber[full]', orderData.phone || '');
+  // Pick up date (month/day/year)
+  var d = orderData.date ? new Date(orderData.date) : null;
+  formData.append('q7_pickUp[month]', d ? String(d.getMonth()+1).padStart(2,'0') : '');
+  formData.append('q7_pickUp[day]',   d ? String(d.getDate()).padStart(2,'0')    : '');
+  formData.append('q7_pickUp[year]',  d ? String(d.getFullYear())                : '');
+  // Full order details in the notes field
+  formData.append('q8_pleaseNote', orderData.notes || '');
+
+  fetch('https://submit.jotform.com/submit/260155816996065', {
+    method: 'POST',
+    body: formData,
+    mode: 'no-cors'
+  }).then(function(){
+    console.log('Order sent to JotForm');
+  }).catch(function(e){
+    console.warn('JotForm submit error:', e);
+  });
+}
+
+function buildOrderNotes(){
+  var items = cart.map(function(c){
+    return c.qty + ' x ' + c.name + ' (' + c.flavor + ')' + (c.price > 0 ? ' - $' + (c.price * c.qty).toFixed(2) : '');
+  }).join('\n');
+  var fulfill = document.querySelector('input[name="fulfill"]:checked');
+  var notes   = document.getElementById('f-notes')    ? document.getElementById('f-notes').value    : '';
+  var occasion= document.getElementById('f-occasion') ? document.getElementById('f-occasion').value : '';
+  return 'ORDER TOTAL: $' + cartTotal().toFixed(2) + '\n\nITEMS:\n' + items
+       + '\n\nFulfillment: ' + (fulfill ? fulfill.value : '')
+       + (occasion ? '\nOccasion: ' + occasion : '')
+       + (notes    ? '\nNotes: '    + notes     : '');
+}
 
 renderProducts();renderBundles();renderCatering();renderHero();go('home');
 </script>
